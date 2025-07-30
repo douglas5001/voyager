@@ -40,3 +40,20 @@ Rode o Migrate
 ````
 flask db upgrade
 ````
+
+
+### Primeirs passos
+
+Crie o usuario
+
+![alt text](image.png)
+
+
+
+Faça Login para obter o Token, capture o valor do token para acessar a rota que nescessita do token
+
+![alt text](image-1.png)
+
+
+Coloque o Token no Header, e antes do Token coloque "Bearer"
+![alt text](image-2.png)

@@ -10,7 +10,7 @@ from ..decorator import admin_required
 class userList(Resource):
     @admin_required
     def get(self):
-        users = user_service.listar_user()
+        users = user_service.list_user()
         us = user_schema.userSchema(many=True)
         return make_response(us.jsonify(users))
 
@@ -24,7 +24,7 @@ class userList(Resource):
             email = request.json["email"]
             password = request.json["password"]
             is_admin = request.json["is_admin"]
-            novo_user = user.user(name=name, email=email, password=password, is_admin=is_admin)
+            novo_user = user.User(name=name, email=email, password=password, is_admin=is_admin)
             resultado = user_service.create_user(novo_user)
             x = us.jsonify(resultado)
             return make_response(x, 201)

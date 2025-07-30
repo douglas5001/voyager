@@ -25,11 +25,11 @@ class LoginList(Resource):
             return make_response(jsonify(validate), 400)
         else:
             email = request.json["email"]
-            senha = request.json["senha"]
+            password = request.json["password"]
 
             user_db = user_service.list_user_email((email))
 
-            if user_db and user_db.show_password(senha):
+            if user_db and user_db.show_password(password):
                 access_token = create_access_token(
                     identity=user_db.id,
                     expires_delta=timedelta(seconds=500)

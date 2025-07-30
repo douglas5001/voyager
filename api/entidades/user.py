@@ -1,4 +1,4 @@
-class user():
+class User():
     def __init__(self, name, email, password, is_admin):
         self.__name = name
         self.__email = email
