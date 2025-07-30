@@ -19,6 +19,45 @@ class LoginList(Resource):
         return {'roles':roles}
 
     def post(self):
+        """
+        Realiza login e retorna tokens JWT
+        ---
+        tags:
+          - Autenticação
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                  - password
+                properties:
+                  email:
+                    type: string
+                    example: usuario@email.com
+                  password:
+                    type: string
+                    example: senha123
+        responses:
+          200:
+            description: Login realizado com sucesso
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                refresh_token:
+                  type: string
+                message:
+                  type: string
+                  example: login realizado com sucesso
+          400:
+            description: Erro de validação nos dados enviados
+          401:
+            description: Credenciais estão inválidas
+        """
         ls = login_schema.LoginSchema()
         validate = ls.validate(request.json)
         if validate:

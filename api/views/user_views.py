@@ -10,11 +10,55 @@ from ..decorator import admin_required
 class userList(Resource):
     @admin_required
     def get(self):
+        """
+        Lista todos os usuários
+        ---
+        tags:
+          - Usuários
+        security:
+          - BearerAuth: []
+        responses:
+          200:
+            description: Lista de usuários retornada com sucesso
+          401:
+            description: Token ausente ou inválido
+        """
         users = user_service.list_user()
         us = user_schema.userSchema(many=True)
         return make_response(us.jsonify(users))
 
     def post(self):
+        """
+        Cria um novo usuário
+        ---
+        tags:
+          - Usuários
+        parameters:
+          - name: body
+            in: body
+            required: true
+            schema:
+              id: User
+              required:
+                - name
+                - email
+                - password
+                - is_admin
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                is_admin:
+                  type: boolean
+        responses:
+          201:
+            description: Usuário criado com sucesso
+          400:
+            description: Erro de validação
+        """
         us = user_schema.userSchema()
         validate = us.validate(request.json)
         if validate:

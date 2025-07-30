@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 import pymysql
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
+from flasgger import Swagger
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -16,6 +17,24 @@ migrate = Migrate(app, db)
 api = Api(app)
 jwt = JWTManager(app)
 
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "API REST FULL",
+        "description": "Documentação da API com autenticação JWT",
+        "version": "1.0.0"
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Authorization header usando o esquema Bearer. Exemplo: 'Bearer {seu_token}'"
+        }
+    }
+}
+
+swagger = Swagger(app, template=swagger_template)
 
 from .models import user_model
 from .views import user_views, login_viwes, refresh_toke_views

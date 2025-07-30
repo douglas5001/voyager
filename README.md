@@ -57,3 +57,10 @@ Faça Login para obter o Token, capture o valor do token para acessar a rota que
 
 Coloque o Token no Header, e antes do Token coloque "Bearer"
 ![alt text](image-2.png)
+
+
+### Acesse a doumentação pleo Swagger
+
+````
+http://127.0.0.1:8000/apidocs/#/
+````
