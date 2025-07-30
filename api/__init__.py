@@ -36,5 +36,5 @@ swagger_template = {
 
 swagger = Swagger(app, template=swagger_template)
 
-from .models import user_model
-from .views import user_views, login_viwes, refresh_toke_views
+from .models import user_model, permission_model
+from .views import user_views, login_viwes, refresh_toke_views, profile_views, permission_views

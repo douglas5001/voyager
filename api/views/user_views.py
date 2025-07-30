@@ -1,14 +1,15 @@
 from flask_restful import Resource
 from api import api
+from ..permission_required import permission_required
 from ..schemas import user_schema
 from flask import request, make_response, jsonify
 from ..entidades import user
 from ..services import user_service
 from flask_jwt_extended import jwt_required, get_jwt
-from ..decorator import admin_required
+
 
 class userList(Resource):
-    @admin_required
+    @permission_required("listuser")
     def get(self):
         """
         Lista todos os usuários
