@@ -2,13 +2,32 @@ from flask import jsonify, make_response, request
 from flask_restful import Resource
 
 from api import api
-from ..schemas.profile_permission_schema import ProfileSchema
+from ..schemas import profile_permission_schema
 from ..services import profile_permission_service
 from ..permission_required import permission_required
 from ..entity import profile_permission
 
 class ProfileList(Resource):
     # @permission_required("profile:create")
+    def get(self):
+      """
+      Listar todos os perfis cadastrados.
+
+      ---
+      tags:
+        - Profile
+      responses:
+        200:
+          description: Lista de perfis obtida com sucesso
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ProfileResponse'
+      """
+      profile = profile_permission_service.list_profile()
+      schema = profile_permission_schema.ProfileSchema(many=True)
+      return make_response(schema.jsonify(profile))
+    
     def post(self):
         """
         Criar um novo perfil e vincular permissões existentes.
@@ -57,7 +76,7 @@ class ProfileList(Resource):
           400:
             description: Erro de validação nos dados de entrada
         """
-        schema = ProfileSchema()
+        schema = profile_permission_schema.ProfileSchema()
         validate = schema.validate(request.json)
         if validate:
             return make_response(jsonify(validate), 400)
@@ -152,7 +171,7 @@ class ProfilePermissionAttach(Resource):
         if not profile:
             return make_response(jsonify({"error": "Perfil não encontrado"}), 404)
 
-        schema = ProfileSchema()
+        schema = profile_permission_schema.ProfileSchema()
         return make_response(schema.jsonify(profile), 200)
 
 

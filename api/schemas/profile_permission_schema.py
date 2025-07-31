@@ -1,5 +1,6 @@
 from api import ma
 from ..models import profile_permission_model
+from marshmallow import fields
 
 class PermissionSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -12,9 +13,10 @@ class PermissionSchema(ma.SQLAlchemyAutoSchema):
 class ProfileSchema(ma.SQLAlchemyAutoSchema):
     permissions = ma.Nested(PermissionSchema, many=True)
     
-
     class Meta:
         model = profile_permission_model.Profile
         load_instance = True
         
         fields = ("id", "name")
+        
+    name = fields.String(required=True)

@@ -9,6 +9,25 @@ from ..entity import profile_permission
 
 class PermissionList(Resource):
     #@permission_required("permission:create")
+    def get(self):
+      """
+      Listar todas as permissões disponíveis.
+
+      ---
+      tags:
+        - Permission
+      responses:
+        200:
+          description: Lista de permissões obtida com sucesso
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PermissionResponse'
+      """
+      schema = profile_permission_schema.PermissionSchema(many=True)
+      permission = profile_permission_service.list_permission()
+      return make_response(schema.jsonify(permission))
+    
     def post(self):
         """
         Criar uma nova permissão e atribuí-la a perfis, se necessário.

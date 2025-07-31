@@ -8,6 +8,10 @@ def create_permission(permission):
     db.session.commit()
     return db_permission
 
+def list_permission():
+    permission = profile_permission_model.Permission.query.all()
+    return permission
+
 def list_permission_id(id):
     return profile_permission_model.Permission.query.filter_by(id=id).firtst()
 
@@ -16,6 +20,11 @@ def create_profile(profile):
     db.session.add(db_profile)
     db.session.commit()
     return db_profile
+
+def list_profile():
+    profile = profile_permission_model.Profile.query.all()
+    return profile
+
 
 def list_profile_id(id):
     return profile_permission_model.Profile.query.filter_by(id=id).firtst()
