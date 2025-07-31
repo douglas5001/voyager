@@ -1,14 +1,6 @@
-from ..models.permission_model import Profile, Permission
+from ..models.profile_permission_model import Profile, Permission
 from api import db
 
-# permission
-def create_permission(name: str) -> Permission:
-    perm = Permission(name=name)
-    db.session.add(perm)
-    db.session.commit()
-    return perm
-
-# profile
 def create_profile(name: str, permission_ids: list[int] | None = None) -> Profile:
     profile = Profile(name=name)
     if permission_ids:

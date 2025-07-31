@@ -1,15 +1,20 @@
 from api import ma
-from ..models.permission_model import Profile, Permission
+from ..models import profile_permission_model
 
 class PermissionSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Permission
+        model = profile_permission_model.Permission
         load_instance = True
-        include_fk = True  # exibe o id no dump
+        include_fk = True
+        
+        fields = ("id", "name")
 
 class ProfileSchema(ma.SQLAlchemyAutoSchema):
     permissions = ma.Nested(PermissionSchema, many=True)
+    
 
     class Meta:
-        model = Profile
+        model = profile_permission_model.Profile
         load_instance = True
+        
+        fields = ("id", "name")

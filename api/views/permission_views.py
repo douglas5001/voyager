@@ -1,13 +1,11 @@
-from flask import request
+from flask import jsonify, make_response, request
 from flask_restful import Resource
-
+from api.services import profile_service
 from api import api
-from ..schemas.permission_schema import PermissionSchema
-from ..services import permission_service
+from ..schemas import profile_permission_schema
+from ..services import profile_permission_service
 from ..permission_required import permission_required
-
-schema = PermissionSchema()
-
+from ..entity import profile_permission
 
 class PermissionList(Resource):
     #@permission_required("permission:create")
@@ -55,19 +53,19 @@ class PermissionList(Resource):
           400:
             description: Erro de validação nos dados de entrada
         """
-        erros = schema.validate(request.json)
-        if erros:
-            return erros, 400
-
-        name = request.json["name"]
-        profile_ids = request.json.get("profile_ids", [])
-
-        permission = permission_service.create_permission(name)
-
-        if profile_ids:
-            permission_service.add_permission_to_profiles(permission.id, profile_ids)
-
-        return schema.dump(permission), 201
-
+        schema = profile_permission_schema.PermissionSchema()
+        validate = schema.validate(request.json)
+        if validate:
+            return make_response(jsonify(validate), 400)
+        else:
+          name = request.json["name"]
+          
+          new_permission = profile_permission.Permission(name=name)
+          
+          result = profile_permission_service.create_permission(new_permission)
+          
+          x = schema.jsonify(result)
+          return make_response(x, 201)
+                 
 
 api.add_resource(PermissionList, "/permissions")
