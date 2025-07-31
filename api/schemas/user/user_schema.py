@@ -1,5 +1,5 @@
 from api import ma
-from ..models import user_model
+from ...models.user import user_model
 from marshmallow import fields
 
 class userSchema(ma.SQLAlchemyAutoSchema):

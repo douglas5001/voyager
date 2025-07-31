@@ -1,5 +1,6 @@
 from api import db
 from passlib.hash import pbkdf2_sha256
+from .profile_permission_model import Profile
 
 class User(db.Model):
     __tablename__ = "user"

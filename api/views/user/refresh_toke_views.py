@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from api import api
-from ..schemas import login_schema
+from ...schemas.user import login_schema
 from flask import request, make_response, jsonify
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from datetime import timedelta

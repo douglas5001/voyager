@@ -1,4 +1,4 @@
-from ..models import user_model
+from ...models.user import user_model
 from api import db
 
 def create_user(user):

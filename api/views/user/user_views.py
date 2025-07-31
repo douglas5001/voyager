@@ -1,11 +1,11 @@
 from flask_restful import Resource
 from api import api
-from api.services import profile_service
-from ..permission_required import permission_required
-from ..schemas import user_schema
+from api.services.user import profile_service
+from ...permission_required import permission_required
+from ...schemas.user import user_schema
 from flask import request, make_response, jsonify
-from ..entity import user
-from ..services import user_service
+from ...entity.user import user
+from ...services.user import user_service
 from flask_jwt_extended import jwt_required, get_jwt
 
 

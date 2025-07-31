@@ -1,4 +1,4 @@
-from ..models import profile_permission_model
+from ...models.user import profile_permission_model
 from api import db
 
 # permission

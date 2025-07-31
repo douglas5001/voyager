@@ -2,10 +2,10 @@ from flask import jsonify, make_response, request
 from flask_restful import Resource
 
 from api import api
-from ..schemas import profile_permission_schema
-from ..services import profile_permission_service
-from ..permission_required import permission_required
-from ..entity import profile_permission
+from ...schemas.user import profile_permission_schema
+from ...services.user import profile_permission_service
+from ...permission_required import permission_required
+from ...entity.user import profile_permission
 
 class ProfileList(Resource):
     # @permission_required("profile:create")

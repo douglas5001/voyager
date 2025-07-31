@@ -10,8 +10,8 @@ from flask_jwt_extended import (
 )
 
 from api import api, jwt
-from ..schemas.login_schema import LoginSchema
-from ..services import user_service
+from ...schemas.user import login_schema
+from ...services.user import user_service
 
 
 @jwt.additional_claims_loader
@@ -67,7 +67,7 @@ class LoginResource(Resource):
           401:
             description: Credenciais inválidas
         """
-        schema = LoginSchema()
+        schema = login_schema.LoginSchema()
         erros = schema.validate(request.json)
         if erros:
             return erros, 400
