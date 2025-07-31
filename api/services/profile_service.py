@@ -20,3 +20,4 @@ def create_profile(name: str, permission_ids: list[int] | None = None) -> Profil
 
 def list_profile_id(profile_id: int) -> Profile:
     return Profile.query.get(profile_id)
+

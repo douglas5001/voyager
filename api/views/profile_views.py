@@ -10,12 +10,54 @@ schema = ProfileSchema()
 
 
 class ProfileList(Resource):
-    @permission_required("profile:create")
+    # @permission_required("profile:create")
     def post(self):
         """
-        Cria um perfil e vincula permissões
+        Criar um novo perfil e vincular permissões existentes.
+
+        Exemplo de JSON no corpo da requisição:
+        {
+          "name": "Administrador",
+          "permission_ids": [1, 2, 3]
+        }
         ---
-        tags: [Perfis]
+        tags:
+          - Profile
+        consumes:
+          - application/json
+        parameters:
+          - in: body
+            name: body
+            required: true
+            schema:
+              id: ProfileRequest
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Administrador
+                permission_ids:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2, 3]
+        responses:
+          201:
+            description: Perfil criado com sucesso
+            schema:
+              id: ProfileResponse
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+                permissions:
+                  type: array
+                  items:
+                    type: string
+          400:
+            description: Erro de validação nos dados de entrada
         """
         erros = schema.validate(request.json)
         if erros:

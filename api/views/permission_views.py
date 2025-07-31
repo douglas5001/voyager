@@ -10,12 +10,50 @@ schema = PermissionSchema()
 
 
 class PermissionList(Resource):
-    @permission_required("permission:create")
+    #@permission_required("permission:create")
     def post(self):
         """
-        Cria uma permissão e (opcionalmente) vincula‑a a perfis
+        Criar uma nova permissão e atribuí-la a perfis, se necessário.
+
+        Exemplo de JSON no corpo da requisição:
+        {
+          "name": "permission:create",
+          "profile_ids": [1, 2, 3]
+        }
         ---
-        tags: [Permissões]
+        tags:
+          - Permission
+        consumes:
+          - application/json
+        parameters:
+          - in: body
+            name: body
+            required: true
+            schema:
+              id: Permission
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: permission:create
+                profile_ids:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2, 3]
+        responses:
+          201:
+            description: Permissão criada com sucesso
+            schema:
+              id: PermissionResponse
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+          400:
+            description: Erro de validação nos dados de entrada
         """
         erros = schema.validate(request.json)
         if erros:

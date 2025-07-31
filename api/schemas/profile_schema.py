@@ -8,6 +8,7 @@ class PermissionSchema(ma.SQLAlchemyAutoSchema):
 
 class ProfileSchema(ma.SQLAlchemyAutoSchema):
     permissions = ma.Nested(PermissionSchema, many=True)
+    
 
     class Meta:
         model = Profile
