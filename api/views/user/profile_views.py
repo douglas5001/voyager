@@ -82,8 +82,9 @@ class ProfileList(Resource):
             return make_response(jsonify(validate), 400)
         else:
           name = request.json["name"]
+          permissions = request.json["permissions"]
 
-          new_profile = profile_permission.Profile(name=name)
+          new_profile = profile_permission.Profile(name=name, permission=permissions)
           result = profile_permission_service.create_profile(new_profile)
           x = schema.jsonify(result)
           

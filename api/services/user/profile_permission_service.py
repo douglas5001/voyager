@@ -15,11 +15,6 @@ def list_permission():
 def list_permission_id(id):
     return profile_permission_model.Permission.query.filter_by(id=id).firtst()
 
-def create_profile(profile):
-    db_profile = profile_permission_model.Profile(name=profile.name)
-    db.session.add(db_profile)
-    db.session.commit()
-    return db_profile
 
 def list_profile():
     profile = profile_permission_model.Profile.query.all()
@@ -29,6 +24,15 @@ def list_profile():
 def list_profile_id(id):
     return profile_permission_model.Profile.query.filter_by(id=id).firtst()
 
+
+def create_profile(profile):
+    db_profile = profile_permission_model.Profile(name=profile.name)
+    for i in profile_permission_model.Permission:
+        permission = list_permission_id(i)
+        db_profile.permissions.append(permission)
+    db.session.add(db_profile)
+    db.session.commit()
+    return db_profile
 
 def add_permissions_to_profile(profile_id, permission_ids):
     profile = profile_permission_model.Profile.query.get(profile_id)

@@ -9,6 +9,8 @@ class PermissionSchema(ma.SQLAlchemyAutoSchema):
         include_fk = True
         
         fields = ("id", "name")
+        
+    name = fields.String(required=False)
 
 class ProfileSchema(ma.SQLAlchemyAutoSchema):
     permissions = ma.Nested(PermissionSchema, many=True)
@@ -17,6 +19,6 @@ class ProfileSchema(ma.SQLAlchemyAutoSchema):
         model = profile_permission_model.Profile
         load_instance = True
         
-        fields = ("id", "name")
+        fields = ("id", "name", "permissions")
         
     name = fields.String(required=True)

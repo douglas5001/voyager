@@ -11,6 +11,11 @@ class Permission(db.Model):
     __tablename__ = "permission"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     name = db.Column(db.String(80), unique=True, nullable=False)
+    profiles = db.relationship(
+        "Profile",
+        secondary=profile_permissions,
+        back_populates="permissions"
+    )
 
 class Profile(db.Model):
     __tablename__ = "profile"
@@ -19,6 +24,5 @@ class Profile(db.Model):
     permissions = db.relationship(
         "Permission",
         secondary=profile_permissions,
-        backref=db.backref("profiles", lazy="dynamic"),
-        lazy="dynamic",
+        back_populates="profiles"
     )
