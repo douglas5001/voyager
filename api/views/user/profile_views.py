@@ -77,21 +77,130 @@ class ProfileList(Resource):
             description: Erro de validação nos dados de entrada
         """
         schema = profile_permission_schema.ProfileSchema()
-        validate = schema.validate(request.json)
-        if validate:
-            return make_response(jsonify(validate), 400)
-        else:
-          name = request.json["name"]
-          permissions = request.json["permissions"]
+        errors = schema.validate(request.json)
 
-          new_profile = profile_permission.Profile(name=name, permission=permissions)
-          result = profile_permission_service.create_profile(new_profile)
-          x = schema.jsonify(result)
-          
-          return make_response(x, 201)
+        if errors:
+            return make_response(jsonify(errors), 400)
+
+        data = request.json
+        name = data["name"]
+        permission_ids = data.get("permission_ids", [])
+
+        profile = profile_permission.Profile(name=name, permission_ids=permission_ids)
+        result = profile_permission_service.create_profile(profile)
+
+        return make_response(schema.jsonify(result), 201)
 
 api.add_resource(ProfileList, "/profiles")
 
+
+class ProfileDetail(Resource):
+  def delete(self, id):
+    """
+    Excluir um perfil existente pelo ID.
+
+    ---
+    tags:
+      - Profile
+    parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+        description: ID do perfil a ser excluído
+    responses:
+      204:
+        description: Perfil excluído com sucesso (sem conteúdo)
+      404:
+        description: Perfil não encontrado
+    """
+    profile = profile_permission_service.list_profile_id(id)
+    if profile is None:
+      return make_response(jsonify("Profile não encontrado"), 404)
+    profile_permission_service.delete_profile(profile)
+    return make_response("Profile Excluido", 204)
+  
+  def put(self, id):
+    """
+    Atualizar um perfil existente pelo ID.
+
+    ---
+    tags:
+      - Profile
+    parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+        description: ID do perfil a ser atualizado
+      - in: body
+        name: body
+        required: true
+        schema:
+          id: ProfileUpdate
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              example: Coordenador
+            permission_ids:
+              type: array
+              items:
+                type: integer
+              example: [1, 2, 3]
+    responses:
+      200:
+        description: Perfil atualizado com sucesso
+        schema:
+          id: ProfileResponse
+          properties:
+            id:
+              type: integer
+              example: 2
+            name:
+              type: string
+              example: Coordenador
+            permissions:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: permission:create
+      400:
+        description: Erro de validação nos dados de entrada
+      404:
+        description: Perfil não encontrado
+    """
+    profile = profile_permission_service.list_profile_id(id)
+    if profile is None:
+      return make_response(jsonify("Perfil não existe"), 404)
+    
+    schema = profile_permission_schema.ProfileSchema()
+    validate = schema.validate(request.json)
+    if validate:
+      return make_response(jsonify(validate), 400)
+    else:
+        data = request.json
+        name = data["name"]
+        permission_ids = data.get("permission_ids", [])
+
+        new_profile = profile_permission.Profile(name=name, permission_ids=permission_ids)
+
+        profile_permission_service.put_profile(profile, new_profile)
+        
+        update_profile = profile_permission_service.list_profile_id(id)
+        
+        return make_response(schema.jsonify(update_profile), 200)
+
+
+
+api.add_resource(ProfileDetail, "/profiles/<int:id>")
 
 class ProfilePermissionAttach(Resource):
     def post(self, profile_id):

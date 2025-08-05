@@ -1,23 +1,15 @@
-class Profile():
-    def __init__(self, name, permission):
+class Profile:
+    def __init__(self, name, permission_ids=None):
         self.__name = name
-        self.permission = permission
-        
+        self.__permission_ids = permission_ids or []
+
     @property
     def name(self):
         return self.__name
 
-    @name.setter
-    def name(self, name):
-        self.__name = name
-    
     @property
-    def permission(self):
-        return self.__permission
-
-    @permission.setter
-    def permission(self, permission):
-        self.__permission = permission
+    def permission_ids(self):
+        return self.__permission_ids
 
 class Permission():
     def __init__(self, name):

@@ -10,15 +10,15 @@ class PermissionSchema(ma.SQLAlchemyAutoSchema):
         
         fields = ("id", "name")
         
-    name = fields.String(required=False)
+    name = fields.String(required=True)
 
 class ProfileSchema(ma.SQLAlchemyAutoSchema):
-    permissions = ma.Nested(PermissionSchema, many=True)
-    
+    permission_ids = fields.List(fields.Integer(), required=False, load_only=True)
+    permissions = ma.Nested(PermissionSchema, many=True, dump_only=True)
+
     class Meta:
         model = profile_permission_model.Profile
         load_instance = True
-        
-        fields = ("id", "name", "permissions")
-        
+        fields = ("id", "name", "permission_ids", "permissions")
+
     name = fields.String(required=True)
