@@ -6,6 +6,7 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger
 import pymysql
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -15,6 +16,7 @@ ma = Marshmallow(app)
 migrate = Migrate(app, db)
 api = Api(app)
 jwt = JWTManager(app)
+CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 
 swagger_template = {
     "swagger": "2.0",
