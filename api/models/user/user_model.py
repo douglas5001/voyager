@@ -11,6 +11,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"))
     profile = db.relationship("Profile")
+    image = db.Column(db.String(255))
 
     def encrypt_password(self):
         self.password = pbkdf2_sha256.hash(self.password)

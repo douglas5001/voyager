@@ -6,8 +6,7 @@ from ...schemas.user import user_schema
 from flask import request, make_response, jsonify
 from ...entity.user import user
 from ...services.user import user_service
-from flask_jwt_extended import jwt_required, get_jwt
-
+from werkzeug.datastructures import FileStorage
 
 class userList(Resource):
     @permission_required("listuser")
@@ -50,86 +49,82 @@ class userList(Resource):
 
     def post(self):
         """
-        Criar um novo usuário e vinculá-lo a um perfil existente.
+        Criar um novo usuário e vinculá-lo a um perfil existente, com opção de enviar imagem de perfil.
 
-        Exemplo de JSON no corpo da requisição:
-        {
-          "name": "João da Silva",
-          "email": "joao@email.com",
-          "password": "senhaSegura123",
-          "profile_id": 2,
-          "is_admin": false
-        }
         ---
         tags:
           - User
         consumes:
-          - application/json
+          - multipart/form-data
         parameters:
-          - in: body
-            name: body
+          - in: formData
+            name: name
+            type: string
             required: true
-            schema:
-              id: UserRequest
-              required:
-                - name
-                - email
-                - password
-                - profile_id
-                - is_admin
-              properties:
-                name:
-                  type: string
-                  example: João da Silva
-                email:
-                  type: string
-                  example: joao@email.com
-                password:
-                  type: string
-                  example: senhaSegura123
-                profile_id:
-                  type: integer
-                  example: 2
-                is_admin:
-                  type: boolean
-                  example: false
+            description: Nome do usuário
+          - in: formData
+            name: email
+            type: string
+            required: true
+            description: E-mail do usuário
+          - in: formData
+            name: password
+            type: string
+            required: true
+            description: Senha do usuário
+          - in: formData
+            name: profile_id
+            type: integer
+            required: true
+            description: ID do perfil associado
+          - in: formData
+            name: is_admin
+            type: boolean
+            required: true
+            description: Define se o usuário é administrador
+          - in: formData
+            name: image
+            type: file
+            required: false
+            description: Imagem de perfil do usuário
         responses:
           201:
             description: Usuário criado com sucesso
-            schema:
-              id: UserResponse
-              properties:
-                id:
-                  type: integer
-                name:
-                  type: string
-                email:
-                  type: string
-                profile_id:
-                  type: integer
-                is_admin:
-                  type: boolean
           400:
-            description: Erro de validação nos dados de entrada
+            description: E-mail já cadastrado ou dados inválidos
         """
+        form = request.form
+
         us = user_schema.userSchema()
-        validate = us.validate(request.json)
+        validate = us.validate(form)
         if validate:
             return make_response(jsonify(validate), 400)
-        else:
-            name = request.json["name"]
-            email = request.json["email"]
-            password = request.json["password"]
-            profile_id = request.json["profile_id"]
-            list_profile = profile_service.list_profile_id(profile_id)
-            if list_profile is None:
-              return make_response(jsonify("perfil não existe"))
-            
-            is_admin = request.json["is_admin"]
-            novo_user = user.User(name=name, email=email, password=password, profile_id=profile_id, is_admin=is_admin)
-            resultado = user_service.create_user(novo_user)
-            x = us.jsonify(resultado)
-            return make_response(x, 201)
+
+        name = form["name"]
+        email = form["email"]
+        password = form["password"]
+        profile_id = int(form["profile_id"])
+        is_admin = form["is_admin"].lower() == 'true'
+        file = request.files.get("image")
+
+        list_profile = profile_service.list_profile_id(profile_id)
+        if list_profile is None:
+            return make_response(jsonify("perfil não existe"), 400)
+          
+        existing_user = user_service.list_user_email(email)
+        if existing_user:
+            return make_response(jsonify({"error": "E-mail já está em uso"}), 400)
+
+        novo_user = user.User(
+            name=name,
+            email=email,
+            password=password,
+            profile_id=profile_id,
+            is_admin=is_admin
+        )
+
+        resultado = user_service.create_user(novo_user, image_file=file)
+        return make_response(us.jsonify(resultado), 201)
 
 
 

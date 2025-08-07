@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
@@ -36,6 +37,13 @@ swagger_template = {
 }
 
 swagger = Swagger(app, template=swagger_template)
+
+
+from config import UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 
 from .views.user import user_views, login_viwes, permission_views, profile_views, refresh_toke_views
 

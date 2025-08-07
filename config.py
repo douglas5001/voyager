@@ -16,9 +16,5 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 SECRET_KEY = "aplicacao_flask"
 
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
-USER_AVATAR_DIR = os.path.join(UPLOADS_DIR, "avatars")
-
-MAX_CONTENT_LENGTH = 5 * 1024 * 1024
-ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
