@@ -7,7 +7,7 @@ from flask import request, make_response, jsonify
 from ...entity.user import user
 from ...services.user import user_service
 from werkzeug.datastructures import FileStorage
-
+from werkzeug.exceptions import RequestEntityTooLarge
 class userList(Resource):
     @permission_required("listuser")
     def get(self):
@@ -123,7 +123,14 @@ class userList(Resource):
             is_admin=is_admin
         )
 
-        resultado = user_service.create_user(novo_user, image_file=file)
+        try:
+            resultado = user_service.create_user(novo_user, image_file=file)
+        except ValueError as ve:
+            return make_response(jsonify({"error": str(ve)}), 400)
+        except RequestEntityTooLarge as re:
+            return make_response(jsonify({"error": str(re)}), 413)
+          
+          
         return make_response(us.jsonify(resultado), 201)
 
 

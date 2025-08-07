@@ -3,14 +3,26 @@ import uuid
 from ...models.user import user_model
 from api import db
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 from config import UPLOAD_FOLDER
+from flask import current_app
 
 def save_image_file(image_file):
     if not image_file:
         return None
 
+    ext = image_file.filename.rsplit(".", 1)[-1].lower()
+    if ext not in current_app.config.get("ALLOWED_EXTENSIONS", set()):
+        raise ValueError("Tipo de imagem não permitido. Use PNG, JPG ou JPEG.")
+
+    image_file.seek(0, os.SEEK_END)
+    file_size = image_file.tell()
+    image_file.seek(0)  # voltar ao início
+
+    if file_size > current_app.config.get("MAX_CONTENT_LENGTH", 2 * 1024 * 1024):
+        raise RequestEntityTooLarge("Imagem excede o tamanho máximo permitido de 2MB.")
+
     filename = secure_filename(image_file.filename)
-    ext = filename.rsplit(".", 1)[-1]
     unique_name = f"{uuid.uuid4().hex}.{ext}"
     path = os.path.join(UPLOAD_FOLDER, unique_name)
     image_file.save(path)

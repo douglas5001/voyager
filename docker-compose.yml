@@ -8,22 +8,11 @@ services:
     volumes:
       - .:/app
       - ./uploads:/app/uploads
-    environment:
-      - FLASK_ENV=development
-    depends_on:
-      - db
+    env_file:
+      - .env
+    networks:
+      - metanet1
 
-  db:
-    image: postgres:15
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: SenhaForte123
-      POSTGRES_DB: jpa
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
+networks:
+  postgres_network:
+    driver: bridge
