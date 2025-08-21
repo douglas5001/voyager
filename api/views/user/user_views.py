@@ -8,6 +8,8 @@ from ...entity.user import user
 from ...services.user import user_service
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import RequestEntityTooLarge
+
+
 class userList(Resource):
     @permission_required("listuser")
     def get(self):
@@ -44,7 +46,7 @@ class userList(Resource):
             description: Token ausente ou inválido
         """
         users = user_service.list_user()
-        us = user_schema.userSchema(many=True)
+        us = user_schema.UserSchema(many=True)
         return make_response(us.jsonify(users))
 
     def post(self):
@@ -95,7 +97,7 @@ class userList(Resource):
         """
         form = request.form
 
-        us = user_schema.userSchema()
+        us = user_schema.UserSchema()
         validate = us.validate(form)
         if validate:
             return make_response(jsonify(validate), 400)
@@ -115,7 +117,7 @@ class userList(Resource):
         if existing_user:
             return make_response(jsonify({"error": "E-mail já está em uso"}), 400)
 
-        novo_user = user.User(
+        new_user = user.User(
             name=name,
             email=email,
             password=password,
@@ -124,7 +126,7 @@ class userList(Resource):
         )
 
         try:
-            resultado = user_service.create_user(novo_user, image_file=file)
+            resultado = user_service.create_user(new_user, image_file=file)
         except ValueError as ve:
             return make_response(jsonify({"error": str(ve)}), 400)
         except RequestEntityTooLarge as re:
@@ -132,9 +134,169 @@ class userList(Resource):
           
           
         return make_response(us.jsonify(resultado), 201)
+      
+class userDetail(Resource):
+  def get(self, id):
+    """
+    Buscar um usuário específico pelo ID.
+
+    ⚠️ **Requer token JWT no header**  
+    Exemplo de header:
+    Authorization: Bearer **<seu_token_aqui>**
+
+    ---
+    tags:
+      - User
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: ID do usuário a ser buscado
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Usuário encontrado com sucesso
+        schema:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+            profile_id:
+              type: integer
+            is_admin:
+              type: boolean
+            image:
+              type: string
+      404:
+        description: Usuário não encontrado
+      401:
+        description: Token ausente ou inválido
+    """
+    user = user_service.list_user_id(id)
+    if user is None:
+      return make_response(jsonify("Usuario não encontrado"), 404)
+    schema = user_schema.UserSchema()
+    return make_response(schema.jsonify(user))
+  
+  def put(self, id):
+      """
+      Atualizar um usuário existente pelo ID, com opção de alterar dados pessoais, senha e imagem de perfil.
+
+      ⚠️ **Requer token JWT no header**  
+      Exemplo de header:
+      Authorization: Bearer **<seu_token_aqui>**
+
+      ---
+      tags:
+        - User
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: ID do usuário que será atualizado
+        - in: formData
+          name: name
+          type: string
+          required: true
+          description: Nome atualizado do usuário
+        - in: formData
+          name: email
+          type: string
+          required: true
+          description: E-mail atualizado do usuário
+        - in: formData
+          name: password
+          type: string
+          required: true
+          description: Nova senha do usuário (será criptografada)
+        - in: formData
+          name: profile_id
+          type: integer
+          required: true
+          description: ID do perfil associado
+        - in: formData
+          name: is_admin
+          type: boolean
+          required: true
+          description: Define se o usuário é administrador
+        - in: formData
+          name: image
+          type: file
+          required: false
+          description: Nova imagem de perfil do usuário
+      responses:
+        200:
+          description: Usuário atualizado com sucesso
+          schema:
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              email:
+                type: string
+              profile_id:
+                type: integer
+              is_admin:
+                type: boolean
+              image:
+                type: string
+        400:
+          description: Dados inválidos ou e-mail já em uso
+        404:
+          description: Usuário ou perfil não encontrado
+        413:
+          description: Imagem excede o tamanho máximo permitido (2MB)
+        401:
+          description: Token ausente ou inválido
+      """
+      user_db = user_service.list_user_id(id)
+      if user_db is None:
+          return make_response(jsonify("Usuário não encontrado"), 404)
+
+      schema = user_schema.UserSchema()
+      validate = schema.validate(request.form)
+      if validate:
+          return make_response(jsonify(validate), 400)
+
+      name = request.form["name"]
+      email = request.form["email"]
+      password = request.form["password"]
+      profile_id = int(request.form["profile_id"])
+      is_admin = request.form["is_admin"].lower() == "true"
+      file = request.files.get("image")
+
+      profile = profile_service.list_profile_id(profile_id)
+      if profile is None:
+          return make_response(jsonify("Perfil não encontrado"), 404)
+
+      new_user = user.User(
+          name=name,
+          email=email,
+          password=password,
+          profile_id=profile_id,
+          is_admin=is_admin
+      )
+
+      try:
+          updated_user = user_service.update_user(user_db, new_user, image_file=file)
+      except ValueError as ve:
+          return make_response(jsonify({"error": str(ve)}), 400)
+      except RequestEntityTooLarge as re:
+          return make_response(jsonify({"error": str(re)}), 413)
+
+      return make_response(schema.jsonify(updated_user), 200)
 
 
 
 
 api.add_resource(userList, '/users')
-
+api.add_resource(userDetail, '/users/<int:id>')

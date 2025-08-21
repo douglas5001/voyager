@@ -2,7 +2,7 @@ from api import ma
 from ...models.user import user_model
 from marshmallow import fields
 
-class userSchema(ma.SQLAlchemyAutoSchema):
+class UserSchema(ma.SQLAlchemyAutoSchema):
 
     class Meta:
         model = user_model.User

@@ -49,3 +49,19 @@ def list_user_id(id):
 
 def list_user_email(email):
     return user_model.User.query.filter_by(email=email).first()
+
+def update_user(user_db, new_user, image_file=None):
+    user_db.name = new_user.name
+    user_db.email = new_user.email
+    user_db.password = new_user.password
+    user_db.profile_id = new_user.profile_id
+    user_db.is_admin = new_user.is_admin
+
+    if new_user.password:
+        user_db.encrypt_password()
+
+    if image_file:
+        user_db.image = save_image_file(image_file)
+
+    db.session.commit()
+    return user_db
